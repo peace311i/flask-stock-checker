@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>株価チェック</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f0f0f0; }
+        h1 { margin-bottom: 5px; }
+        .timestamp { color: #555; font-size: 14px; margin-bottom: 20px; }
+    </style>
+    <!-- PWA設定 -->
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#ffffff">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js')
+      .then(function () { console.log("Service Worker Registered"); });
+  }
+</script>
+</head>
+<body>
+    <h1>📈 株価チェック</h1>
+    <div class="timestamp">データ取得日時：{{ now }}</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>銘柄コード（企業名）</th>
+                <th>昨日の終値</th>
+                <th>現在の株価</th>
+                <th>差額</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in prices %}
+            <tr>
+                <td>{{ stock.ticker }}（{{ stock.name }}）</td>
+                <td>{{ stock.prev_close }}</td>
+                <td>{{ stock.current_price }}</td>
+                <td>{{ stock.diff }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
