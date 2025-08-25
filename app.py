@@ -33,16 +33,25 @@ def get_prices(ticker):
 
 @app.route('/')
 def index():
-    with open('tickers.txt') as f:
-        tickers = [line.strip() for line in f if line.strip()]
-    
-    prices = [get_prices(ticker) for ticker in tickers]
+    tickers = []
+    with open('tickers.txt', encoding='utf-8') as f:
+        for line in f:
+            parts = line.strip().split(',')
+            if len(parts) == 2:
+                ticker, name = parts
+                tickers.append((ticker.strip(), name.strip()))
 
-    # 日本時間で現在日時を取得
+    prices = [get_prices(ticker, name) for ticker, name in tickers]
+
+    # 差額（diff）で降順ソート（差額が数値のもののみ）
+    prices = sorted(prices, key=lambda x: x['diff'] if isinstance(x['diff'], float) else -9999, reverse=True)
+
+    # 日本時間の現在時刻
     jst = pytz.timezone('Asia/Tokyo')
     now = datetime.now(jst).strftime('%Y/%m/%d %H:%M:%S')
 
     return render_template('index.html', prices=prices, now=now)
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)

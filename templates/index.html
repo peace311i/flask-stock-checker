@@ -3,24 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>株価チェック</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 80%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background-color: #f0f0f0; }
-        h1 { margin-bottom: 5px; }
-        .timestamp { color: #555; font-size: 14px; margin-bottom: 20px; }
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .ticker-cell {
+            text-align: left;
+        }
+        .ticker-code {
+            font-weight: bold;
+        }
+        .ticker-name {
+            font-size: 14px;
+            color: #555;
+        }
+        .timestamp {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        @media screen and (max-width: 600px) {
+            table, th, td {
+                font-size: 12px;
+            }
+        }
     </style>
-    <!-- PWA設定 -->
-<link rel="manifest" href="/static/manifest.json">
-<meta name="theme-color" content="#ffffff">
-<link rel="apple-touch-icon" href="/static/icon-192.png">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/service-worker.js')
-      .then(function () { console.log("Service Worker Registered"); });
-  }
-</script>
 </head>
 <body>
     <h1>📈 株価チェック</h1>
@@ -29,22 +51,37 @@
     <table>
         <thead>
             <tr>
-                <th>銘柄コード（企業名）</th>
+                <th>銘柄</th>
                 <th>昨日の終値</th>
                 <th>現在の株価</th>
                 <th>差額</th>
             </tr>
         </thead>
-        <tbody>
-            {% for stock in prices %}
-            <tr>
-                <td>{{ stock.ticker }}（{{ stock.name }}）</td>
-                <td>{{ stock.prev_close }}</td>
-                <td>{{ stock.current_price }}</td>
-                <td>{{ stock.diff }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+<tbody>
+    {% for stock in prices %}
+    <tr>
+        <td class="ticker-cell">
+            <div class="ticker-code">{{ stock.ticker }}</div>
+            <div class="ticker-name">{{ stock.name }}</div>
+        </td>
+        <td>{{ stock.prev_close }}</td>
+        <td>{{ stock.current_price }}</td>
+        <td>
+            {% if stock.diff != 'N/A' %}
+                {% if stock.diff > 0 %}
+                    <span style="color: green;">+{{ stock.diff }}</span>
+                {% elif stock.diff < 0 %}
+                    <span style="color: red;">{{ stock.diff }}</span>
+                {% else %}
+                    {{ stock.diff }}
+                {% endif %}
+            {% else %}
+                {{ stock.diff }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
     </table>
 </body>
 </html>
