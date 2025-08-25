@@ -47,7 +47,12 @@
 </head>
 <body>
     <h1>📈 株価チェック</h1>
-    <div class="timestamp">データ取得日時：{{ now }}</div>
+<div class="timestamp">
+    データ取得日時：{{ now }}
+    <form method="get" action="/?t={{ now|urlencode }}" style="display:inline;">
+        <button type="submit">🔄 更新</button>
+    </form>
+</div>
     <div class="timestamp">
         全銘柄数：{{ total }}　
         📈 値上がり：{{ up_count }}　
