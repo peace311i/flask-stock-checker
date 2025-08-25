@@ -11,7 +11,7 @@ def get_prices(ticker):
     hist = stock.history(period="2d")
 
     try:
-        name = stock.info.get('shortName', 'N/A')  # 英語企業名
+        name = stock.info.get('shortName', 'N/A')  # 英語名
     except:
         name = 'N/A'
 
@@ -34,20 +34,32 @@ def get_prices(ticker):
 
 @app.route('/')
 def index():
-    tickers = []
     with open('tickers.txt', encoding='utf-8') as f:
         tickers = [line.strip() for line in f if line.strip()]
 
     prices = [get_prices(ticker) for ticker in tickers]
 
-    # 差額の大きい順
+    # 差額で降順ソート
     prices = sorted(prices, key=lambda x: x['diff'] if isinstance(x['diff'], (int, float)) else -9999, reverse=True)
 
-    # 日本時間での取得時刻
+    # サマリー統計
+    total = len(prices)
+    up_count = sum(1 for p in prices if isinstance(p['diff'], (int, float)) and p['diff'] > 0)
+    down_count = sum(1 for p in prices if isinstance(p['diff'], (int, float)) and p['diff'] < 0)
+    valid_diffs = [p['diff'] for p in prices if isinstance(p['diff'], (int, float))]
+    avg_diff = round(sum(valid_diffs) / len(valid_diffs), 2) if valid_diffs else None
+
+    # 日本時間
     jst = pytz.timezone('Asia/Tokyo')
     now = datetime.now(jst).strftime('%Y/%m/%d %H:%M:%S')
 
-    return render_template('index.html', prices=prices, now=now)
+    return render_template('index.html',
+                           prices=prices,
+                           now=now,
+                           total=total,
+                           up_count=up_count,
+                           down_count=down_count,
+                           avg_diff=avg_diff)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

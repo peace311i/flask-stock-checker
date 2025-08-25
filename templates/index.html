@@ -36,7 +36,7 @@
         .timestamp {
             color: #555;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         @media screen and (max-width: 600px) {
             table, th, td {
@@ -48,6 +48,23 @@
 <body>
     <h1>📈 株価チェック</h1>
     <div class="timestamp">データ取得日時：{{ now }}</div>
+    <div class="timestamp">
+        全銘柄数：{{ total }}　
+        📈 値上がり：{{ up_count }}　
+        📉 値下がり：{{ down_count }}　
+        📊 平均差額：
+        {% if avg_diff is not none %}
+            {% if avg_diff > 0 %}
+                <span style="color: green;">+{{ avg_diff }}</span>
+            {% elif avg_diff < 0 %}
+                <span style="color: red;">{{ avg_diff }}</span>
+            {% else %}
+                {{ avg_diff }}
+            {% endif %}
+        {% else %}
+            N/A
+        {% endif %}
+    </div>
 
     <table>
         <thead>
