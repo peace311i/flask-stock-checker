@@ -83,10 +83,14 @@
         <tbody>
             {% for stock in prices %}
             <tr>
-                <td class="ticker-cell">
-                    <div class="ticker-code">{{ stock.ticker }}</div>
-                    <div class="ticker-name">{{ stock.name }}</div>
-                </td>
+<td class="ticker-cell">
+    <div class="ticker-code">
+        <a href="https://finance.yahoo.co.jp/quote/{{ stock.ticker }}" target="_blank" rel="noopener noreferrer">
+            {{ stock.ticker }}
+        </a>
+    </div>
+    <div class="ticker-name">{{ stock.name }}</div>
+</td>
                 <td>{{ stock.prev_close if stock.prev_close is not none else 'N/A' }}</td>
                 <td>{{ stock.current_price if stock.current_price is not none else 'N/A' }}</td>
                 <td>
