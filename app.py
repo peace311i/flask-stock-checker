@@ -2,6 +2,7 @@ from flask import Flask, render_template
 import yfinance as yf
 from datetime import datetime
 import pytz
+import os
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ def get_prices(ticker):
     hist = stock.history(period="2d")
 
     try:
-        name = stock.info.get('shortName', 'N/A')
+        name = stock.info.get('shortName', 'N/A')  # 英語企業名
     except:
         name = 'N/A'
 
@@ -26,31 +27,28 @@ def get_prices(ticker):
     return {
         'ticker': ticker,
         'name': name,
-        'prev_close': round(prev_close, 2) if prev_close else 'N/A',
-        'current_price': round(current_price, 2) if current_price else 'N/A',
-        'diff': round(diff, 2) if diff else 'N/A'
+        'prev_close': round(prev_close, 2) if prev_close else None,
+        'current_price': round(current_price, 2) if current_price else None,
+        'diff': round(diff, 2) if diff else None
     }
 
 @app.route('/')
 def index():
     tickers = []
     with open('tickers.txt', encoding='utf-8') as f:
-        for line in f:
-            parts = line.strip().split(',')
-            if len(parts) == 2:
-                ticker, name = parts
-                tickers.append((ticker.strip(), name.strip()))
+        tickers = [line.strip() for line in f if line.strip()]
 
-    prices = [get_prices(ticker, name) for ticker, name in tickers]
+    prices = [get_prices(ticker) for ticker in tickers]
 
-    # 差額（diff）で降順ソート（差額が数値のもののみ）
-    prices = sorted(prices, key=lambda x: x['diff'] if isinstance(x['diff'], float) else -9999, reverse=True)
+    # 差額の大きい順
+    prices = sorted(prices, key=lambda x: x['diff'] if isinstance(x['diff'], (int, float)) else -9999, reverse=True)
 
-    # 日本時間の現在時刻
+    # 日本時間での取得時刻
     jst = pytz.timezone('Asia/Tokyo')
     now = datetime.now(jst).strftime('%Y/%m/%d %H:%M:%S')
 
     return render_template('index.html', prices=prices, now=now)
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)

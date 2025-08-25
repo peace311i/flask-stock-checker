@@ -18,6 +18,7 @@
             border: 1px solid #ccc;
             padding: 8px;
             vertical-align: top;
+            text-align: left;
         }
         th {
             background-color: #f0f0f0;
@@ -57,31 +58,31 @@
                 <th>差額</th>
             </tr>
         </thead>
-<tbody>
-    {% for stock in prices %}
-    <tr>
-        <td class="ticker-cell">
-            <div class="ticker-code">{{ stock.ticker }}</div>
-            <div class="ticker-name">{{ stock.name }}</div>
-        </td>
-        <td>{{ stock.prev_close }}</td>
-        <td>{{ stock.current_price }}</td>
-        <td>
-            {% if stock.diff != 'N/A' %}
-                {% if stock.diff > 0 %}
-                    <span style="color: green;">+{{ stock.diff }}</span>
-                {% elif stock.diff < 0 %}
-                    <span style="color: red;">{{ stock.diff }}</span>
-                {% else %}
-                    {{ stock.diff }}
-                {% endif %}
-            {% else %}
-                {{ stock.diff }}
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</tbody>
+        <tbody>
+            {% for stock in prices %}
+            <tr>
+                <td class="ticker-cell">
+                    <div class="ticker-code">{{ stock.ticker }}</div>
+                    <div class="ticker-name">{{ stock.name }}</div>
+                </td>
+                <td>{{ stock.prev_close if stock.prev_close is not none else 'N/A' }}</td>
+                <td>{{ stock.current_price if stock.current_price is not none else 'N/A' }}</td>
+                <td>
+                    {% if stock.diff is not none %}
+                        {% if stock.diff > 0 %}
+                            <span style="color: green;">+{{ stock.diff }}</span>
+                        {% elif stock.diff < 0 %}
+                            <span style="color: red;">{{ stock.diff }}</span>
+                        {% else %}
+                            {{ stock.diff }}
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </body>
 </html>
